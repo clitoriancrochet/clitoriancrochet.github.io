@@ -463,7 +463,8 @@
 
     // Save canvas as PNG or JPG for upload canvas
     function saveUploadCanvasAsPNG() {
-      const scale = 4;
+      const filename = prompt("Enter a file name for your PNG:", "clitorian-upload-chart") || "clitorian-upload-chart";
+  const scale = 4;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = uploadCanvas.width * scale;
   tempCanvas.height = uploadCanvas.height * scale;
@@ -472,12 +473,13 @@
   tempCtx.drawImage(uploadCanvas, 0, 0);
 
   const link = document.createElement('a');
-  link.download = 'clitorian-upload-chart.png';
+  link.download = `${filename}.png`;
   link.href = tempCanvas.toDataURL('image/png');
   link.click();
     }
     function saveUploadCanvasAsJPG() {
-     const scale = 4;
+     const filename = prompt("Enter a file name for your JPG:", "clitorian-upload-chart") || "clitorian-upload-chart";
+  const scale = 4;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = uploadCanvas.width * scale;
   tempCanvas.height = uploadCanvas.height * scale;
@@ -486,7 +488,7 @@
   tempCtx.drawImage(uploadCanvas, 0, 0);
 
   const link = document.createElement('a');
-  link.download = 'clitorian-upload-chart.jpg';
+  link.download = `${filename}.jpg`;
   link.href = tempCanvas.toDataURL('image/jpeg', 0.92);
   link.click();
     }
@@ -630,21 +632,8 @@
     }
 
     // Save draw canvas as PNG or JPG
-    function saveDrawCanvasAsPNG() {
-    const scale = 4;
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = drawCanvas.width * scale;
-  tempCanvas.height = drawCanvas.height * scale;
-  const tempCtx = tempCanvas.getContext('2d');
-  tempCtx.scale(scale, scale);
-  tempCtx.drawImage(drawCanvas, 0, 0);
-
-  const link = document.createElement('a');
-  link.download = 'clitorian-draw-chart.png';
-  link.href = tempCanvas.toDataURL('image/png');
-  link.click();
-    }
-   function saveDrawCanvasAsJPG() {
+   function saveDrawCanvasAsPNG() {
+  const filename = prompt("Enter a file name for your PNG:", "clitorian-draw-chart") || "clitorian-draw-chart";
   const scale = 4;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = drawCanvas.width * scale;
@@ -654,8 +643,23 @@
   tempCtx.drawImage(drawCanvas, 0, 0);
 
   const link = document.createElement('a');
-  link.download = 'clitorian-draw-chart.jpg';
-  link.href = tempCanvas.toDataURL('image/jpeg', 0.92);
+  link.download = `${filename}.png`;
+  link.href = tempCanvas.toDataURL('image/png');
+  link.click();
+}
+   function saveDrawCanvasAsJPG() {
+    const filename = prompt("Enter a file name for your JPG:", "clitorian-draw-chart") || "clitorian-draw-chart";
+  const scale = 4;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = drawCanvas.width * scale;
+  tempCanvas.height = drawCanvas.height * scale;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.scale(scale, scale);
+  tempCtx.drawImage(drawCanvas, 0, 0);
+
+  const link = document.createElement('a');
+  link.download = `${filename}.jpg`;
+  link.href = tempCanvas.toDataURL('image/jpeg');
   link.click();
     }
 
