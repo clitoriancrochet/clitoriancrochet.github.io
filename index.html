@@ -463,16 +463,32 @@
 
     // Save canvas as PNG or JPG for upload canvas
     function saveUploadCanvasAsPNG() {
-      const link = document.createElement('a');
-      link.download = 'clitorian-upload-chart.png';
-      link.href = uploadCanvas.toDataURL('image/png');
-      link.click();
+      const scale = 4;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = uploadCanvas.width * scale;
+  tempCanvas.height = uploadCanvas.height * scale;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.scale(scale, scale);
+  tempCtx.drawImage(uploadCanvas, 0, 0);
+
+  const link = document.createElement('a');
+  link.download = 'clitorian-upload-chart.png';
+  link.href = tempCanvas.toDataURL('image/png');
+  link.click();
     }
     function saveUploadCanvasAsJPG() {
-      const link = document.createElement('a');
-      link.download = 'clitorian-upload-chart.jpg';
-      link.href = uploadCanvas.toDataURL('image/jpeg', 0.92);
-      link.click();
+     const scale = 4;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = uploadCanvas.width * scale;
+  tempCanvas.height = uploadCanvas.height * scale;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.scale(scale, scale);
+  tempCtx.drawImage(uploadCanvas, 0, 0);
+
+  const link = document.createElement('a');
+  link.download = 'clitorian-upload-chart.jpg';
+  link.href = tempCanvas.toDataURL('image/jpeg', 0.92);
+  link.click();
     }
 
     // --- DRAW MODE ---
@@ -615,16 +631,32 @@
 
     // Save draw canvas as PNG or JPG
     function saveDrawCanvasAsPNG() {
-      const link = document.createElement('a');
-      link.download = 'clitorian-draw-chart.png';
-      link.href = drawCanvas.toDataURL('image/png');
-      link.click();
+    const scale = 4;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = drawCanvas.width * scale;
+  tempCanvas.height = drawCanvas.height * scale;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.scale(scale, scale);
+  tempCtx.drawImage(drawCanvas, 0, 0);
+
+  const link = document.createElement('a');
+  link.download = 'clitorian-draw-chart.png';
+  link.href = tempCanvas.toDataURL('image/png');
+  link.click();
     }
-    function saveDrawCanvasAsJPG() {
-      const link = document.createElement('a');
-      link.download = 'clitorian-draw-chart.jpg';
-      link.href = drawCanvas.toDataURL('image/jpeg', 0.92);
-      link.click();
+   function saveDrawCanvasAsJPG() {
+  const scale = 4;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = drawCanvas.width * scale;
+  tempCanvas.height = drawCanvas.height * scale;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.scale(scale, scale);
+  tempCtx.drawImage(drawCanvas, 0, 0);
+
+  const link = document.createElement('a');
+  link.download = 'clitorian-draw-chart.jpg';
+  link.href = tempCanvas.toDataURL('image/jpeg', 0.92);
+  link.click();
     }
 
     // --- Color utils ---
