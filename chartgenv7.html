@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clitorian Crochet Alpha Chart Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Raleway:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background-color: #fff0f6;
+      color: #5a005a;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: 'Pacifico', cursive;
+      text-align: center;
+      color: #ff69b4;
+      font-size: 2.5rem;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .panel {
+      background: white;
+      border: 2px dashed #ffb6c1;
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .panel h2 {
+      font-size: 1.4rem;
+      color: #d63384;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    input[type="number"] {
+      width: 80px;
+      margin: 0 0.5rem 0 0;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+      cursor: crosshair;
+      image-rendering: pixelated;
+    }
+    .toolbox button {
+      margin: 0.25rem;
+      padding: 0.5rem 1rem;
+      background-color: #ffb6c1;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toolbox button.active {
+      background-color: #ff69b4;
+      color: white;
+    }
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .legend {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 90%;
+    }
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border: 2px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .color-swatch.selected {
+      border-color: #ff69b4;
+      box-shadow: 0 0 5px #ff69b4;
+    }
+    label {
+      user-select: none;
+    }
+    button {
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧶 Clitorian Crochet Alpha Chart Generator</h1>
+  <div class="container">
+    <!-- Upload and Edit Mode -->
+    <div class="panel" id="upload-panel">
+      <h2>📸 Upload & Edit Image</h2>
+      <input type="file" accept="image/*" id="uploadInput" />
+      <div class="controls">
+        <label>Width: <input type="number" id="uploadWidth" value="50" min="1" max="200" /></label>
+        <label>Height: <input type="number" id="uploadHeight" value="50" min="1" max="200" /></label>
+        <label>Colors: <input type="number" id="colorLimit" value="6" min="2" max="12" /></label>
+        <label><input type="checkbox" id="trimOption" /> Trim to aspect</label>
+      </div>
+      <button onclick="processUpload()">Generate Chart</button>
+
+      <canvas id="uploadCanvas" width="400" height="400" style="margin-top:1rem;"></canvas>
+
+      <div id="uploadLegend" class="legend" aria-label="Upload color legend"></div>
+
+      <div class="toolbox" style="margin-top:1rem;">
+        <button onclick="selectDrawTool('draw')" id="upload-tool-draw" class="active">✏️ Draw</button>
+        <button onclick="selectDrawTool('fill')" id="upload-tool-fill">🪣 Fill</button>
+        <button onclick="selectDrawTool('erase')" id="upload-tool-erase">🧽 Erase</button>
+      </div>
+
+      <label style="margin-top:0.5rem;">Color:
+        <input type="color" id="uploadColorPicker" value="#ff69b4" style="vertical-align: middle;" />
+      </label>
+
+      <div style="margin-top: 0.5rem;">
+        <button onclick="saveUploadCanvasAsPNG()">Save as PNG</button>
+        <button onclick="saveUploadCanvasAsJPG()">Save as JPG</button>
+        <button onclick="saveUploadWIP()">💾 Save WIP</button>
+        <button onclick="loadUploadWIP()">📂 Load WIP</button>
+      </div>
+    </div>
+
+    <!-- Draw Mode for custom blank chart -->
+    <div class="panel" id="draw-panel">
+      <h2>🎨 Draw Your Own Pattern</h2>
+      <label>Grid Size:
+        <input type="number" id="drawSize" value="20" min="5" max="200" />
+      </label>
+      <button onclick="initDrawCanvas()">Start Drawing</button>
+
+      <canvas id="drawCanvas" width="400" height="400" style="margin-top:1rem;"></canvas>
+
+      <div id="drawLegend" class="legend" aria-label="Draw color legend"></div>
+
+      <div class="toolbox" style="margin-top:1rem;">
+        <button onclick="selectDrawTool('draw', true)" id="draw-tool-draw" class="active">✏️ Draw</button>
+        <button onclick="selectDrawTool('fill', true)" id="draw-tool-fill">🪣 Fill</button>
+        <button onclick="selectDrawTool('erase', true)" id="draw-tool-erase">🧽 Erase</button>
+      </div>
+
+      <label style="margin-top:0.5rem;">Color:
+        <input type="color" id="drawColorPicker" value="#ff69b4" style="vertical-align: middle;" />
+      </label>
+
+      <div style="margin-top: 0.5rem;">
+        <button onclick="saveDrawCanvasAsPNG()">Save as PNG</button>
+        <button onclick="saveDrawCanvasAsJPG()">Save as JPG</button>
+        <button onclick="saveDrawWIP()">💾 Save WIP</button>
+        <button onclick="loadDrawWIP()">📂 Load WIP</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Globals for Upload/Edit Mode ---
+    let uploadCanvas = document.getElementById('uploadCanvas');
+    let uploadCtx = uploadCanvas.getContext('2d');
+    let uploadGridWidth = 50;
+    let uploadGridHeight = 50;
+    let uploadColorLimit = 6;
+    let uploadTrim = false;
+    let uploadImageData = null; // stores reduced color pixels as 2D array [row][col] = color string or null
+    let uploadColorPalette = []; // unique colors used
+    let uploadDrawTool = 'draw';
+    let uploadSelectedColor = '#ff69b4';
+
+    // --- Globals for Draw Mode ---
+    let drawCanvas = document.getElementById('drawCanvas');
+    let drawCtx = drawCanvas.getContext('2d');
+    let drawGridSize = 20;
+    let drawData = [];
+    let drawTool = 'draw';
+    let drawSelectedColor = '#ff69b4';
+
+    // UTILS
+
+    // Helper: create empty 2D array
+    function createEmptyGrid(w, h) {
+      let arr = new Array(h);
+      for (let y = 0; y < h; y++) {
+        arr[y] = new Array(w).fill(null);
+      }
+      return arr;
+    }
+
+    // --- UPLOAD/EDIT MODE ---
+
+    // Process uploaded image, reduce colors, generate grid
+    function processUpload() {
+      const fileInput = document.getElementById('uploadInput');
+      if (!fileInput.files.length) {
+        alert('Please select an image first.');
+        return;
+      }
+      uploadGridWidth = parseInt(document.getElementById('uploadWidth').value);
+      uploadGridHeight = parseInt(document.getElementById('uploadHeight').value);
+      uploadColorLimit = parseInt(document.getElementById('colorLimit').value);
+      uploadTrim = document.getElementById('trimOption').checked;
+
+      const file = fileInput.files[0];
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Resize and optionally trim aspect ratio:
+        let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+        if (uploadTrim) {
+          // Calculate crop to preserve aspect ratio based on width & height inputs
+          let targetRatio = uploadGridWidth / uploadGridHeight;
+          let imgRatio = img.width / img.height;
+
+          if (imgRatio > targetRatio) {
+            // Crop width
+            sw = img.height * targetRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            // Crop height
+            sh = img.width / targetRatio;
+            sy = (img.height - sh) / 2;
+          }
+        }
+
+        // Draw resized & cropped image on temp canvas
+        let tempCanvas = document.createElement('canvas');
+        tempCanvas.width = uploadGridWidth;
+        tempCanvas.height = uploadGridHeight;
+        let tempCtx = tempCanvas.getContext('2d');
+        tempCtx.clearRect(0, 0, uploadGridWidth, uploadGridHeight);
+        tempCtx.drawImage(img, sx, sy, sw, sh, 0, 0, uploadGridWidth, uploadGridHeight);
+
+        // Get pixel data
+        const imgData = tempCtx.getImageData(0, 0, uploadGridWidth, uploadGridHeight);
+        let pixels = imgData.data;
+
+        // Convert pixel data to array of [r,g,b]
+        let rgbPixels = [];
+        for (let i = 0; i < pixels.length; i += 4) {
+          rgbPixels.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
+        }
+
+        // Reduce colors with k-means clustering
+        const reduced = kMeansColorReduction(rgbPixels, uploadColorLimit);
+
+        // Map reduced colors back to grid, build palette
+        uploadImageData = [];
+        uploadColorPalette = [];
+
+        // helper to add to palette if new color
+        function addColorToPalette(c) {
+          let hex = rgbToHex(c[0], c[1], c[2]);
+          if (!uploadColorPalette.includes(hex)) uploadColorPalette.push(hex);
+          return hex;
+        }
+
+        for (let y = 0; y < uploadGridHeight; y++) {
+          uploadImageData[y] = [];
+          for (let x = 0; x < uploadGridWidth; x++) {
+            const idx = y * uploadGridWidth + x;
+            const c = reduced[idx];
+            const hex = addColorToPalette(c);
+            uploadImageData[y][x] = hex;
+          }
+        }
+
+        // Resize uploadCanvas for clarity:
+        uploadCanvas.width = 400;
+        uploadCanvas.height = 400;
+        renderUploadChart();
+        renderUploadLegend();
+      };
+
+      img.onerror = () => alert('Failed to load image.');
+      img.src = url;
+    }
+
+    // Render the upload chart grid with colors and grid lines
+    function renderUploadChart() {
+      const ctx = uploadCtx;
+      const width = uploadCanvas.width;
+      const height = uploadCanvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (!uploadImageData) return;
+
+      const cols = uploadGridWidth;
+      const rows = uploadGridHeight;
+      const cellW = width / cols;
+      const cellH = height / rows;
+
+      // Draw pixels
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          ctx.fillStyle = uploadImageData[y][x] || '#fff';
+          ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+        }
+      }
+
+      // Draw grid lines
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= cols; x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * cellW, 0);
+        ctx.lineTo(x * cellW, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= rows; y++) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * cellH);
+        ctx.lineTo(width, y * cellH);
+        ctx.stroke();
+      }
+    }
+
+    // Render the color legend below upload chart
+    function renderUploadLegend() {
+      const legendDiv = document.getElementById('uploadLegend');
+      legendDiv.innerHTML = '';
+      uploadColorPalette.forEach(color => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch';
+        swatch.style.backgroundColor = color;
+        if (color === uploadSelectedColor) swatch.classList.add('selected');
+        swatch.title = color;
+        swatch.dataset.color = color;
+        swatch.addEventListener('click', () => {
+          uploadSelectedColor = color;
+          document.getElementById('uploadColorPicker').value = color;
+          updateLegendSelection('uploadLegend', color);
+        });
+        legendDiv.appendChild(swatch);
+      });
+    }
+
+    function updateLegendSelection(legendId, selectedColor) {
+      const legendDiv = document.getElementById(legendId);
+      Array.from(legendDiv.children).forEach(child => {
+        if (child.dataset.color === selectedColor) {
+          child.classList.add('selected');
+        } else {
+          child.classList.remove('selected');
+        }
+      });
+    }
+
+    // Draw/editing logic for upload canvas
+    uploadCanvas.addEventListener('click', (e) => {
+      if (!uploadImageData) return;
+      const rect = uploadCanvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / (uploadCanvas.width / uploadGridWidth));
+      const y = Math.floor((e.clientY - rect.top) / (uploadCanvas.height / uploadGridHeight));
+      if (x < 0 || y < 0 || x >= uploadGridWidth || y >= uploadGridHeight) return;
+
+      if (uploadDrawTool === 'draw') {
+        uploadImageData[y][x] = uploadSelectedColor;
+      } else if (uploadDrawTool === 'erase') {
+        uploadImageData[y][x] = null;
+      } else if (uploadDrawTool === 'fill') {
+        const targetColor = uploadImageData[y][x];
+        floodFill(uploadImageData, x, y, targetColor, uploadSelectedColor, uploadGridWidth, uploadGridHeight);
+      }
+      renderUploadChart();
+      renderUploadLegend();
+    });
+
+    // Tool selection for upload panel
+    function selectDrawTool(tool, isDrawPanel = false) {
+      if (isDrawPanel) {
+        drawTool = tool;
+        document.querySelectorAll('#draw-panel .toolbox button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('draw-tool-' + tool).classList.add('active');
+      } else {
+        uploadDrawTool = tool;
+        document.querySelectorAll('#upload-panel .toolbox button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('upload-tool-' + tool).classList.add('active');
+      }
+    }
+
+    // Sync color pickers and selected colors
+    document.getElementById('uploadColorPicker').addEventListener('input', e => {
+      uploadSelectedColor = e.target.value;
+      updateLegendSelection('uploadLegend', uploadSelectedColor);
+    });
+    document.getElementById('drawColorPicker').addEventListener('input', e => {
+      drawSelectedColor = e.target.value;
+      updateLegendSelection('drawLegend', drawSelectedColor);
+    });
+
+    // Flood fill algorithm for 2D color arrays
+    function floodFill(grid, x, y, targetColor, fillColor, width, height) {
+      if (targetColor === fillColor) return;
+      const stack = [[x, y]];
+
+      while (stack.length) {
+        const [cx, cy] = stack.pop();
+        if (cx < 0 || cy < 0 || cx >= width || cy >= height) continue;
+        if (grid[cy][cx] !== targetColor) continue;
+        grid[cy][cx] = fillColor;
+        stack.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+      }
+    }
+
+    // Save / Load WIP for upload
+    function saveUploadWIP() {
+      if (!uploadImageData) {
+        alert('No chart to save!');
+        return;
+      }
+      const wip = {
+        width: uploadGridWidth,
+        height: uploadGridHeight,
+        data: uploadImageData,
+        palette: uploadColorPalette,
+      };
+      localStorage.setItem('clitorianUploadWIP', JSON.stringify(wip));
+      alert('Upload chart work-in-progress saved!');
+    }
+    function loadUploadWIP() {
+      const saved = localStorage.getItem('clitorianUploadWIP');
+      if (!saved) {
+        alert('No saved upload work found.');
+        return;
+      }
+      const wip = JSON.parse(saved);
+      uploadGridWidth = wip.width;
+      uploadGridHeight = wip.height;
+      uploadImageData = wip.data;
+      uploadColorPalette = wip.palette;
+
+      document.getElementById('uploadWidth').value = uploadGridWidth;
+      document.getElementById('uploadHeight').value = uploadGridHeight;
+
+      uploadCanvas.width = 400;
+      uploadCanvas.height = 400;
+      renderUploadChart();
+      renderUploadLegend();
+      alert('Upload chart work-in-progress loaded!');
+    }
+
+    // Save canvas as PNG or JPG for upload canvas
+    function saveUploadCanvasAsPNG() {
+      const link = document.createElement('a');
+      link.download = 'clitorian-upload-chart.png';
+      link.href = uploadCanvas.toDataURL('image/png');
+      link.click();
+    }
+    function saveUploadCanvasAsJPG() {
+      const link = document.createElement('a');
+      link.download = 'clitorian-upload-chart.jpg';
+      link.href = uploadCanvas.toDataURL('image/jpeg', 0.92);
+      link.click();
+    }
+
+    // --- DRAW MODE ---
+
+    // Initialize drawing canvas grid
+    function initDrawCanvas() {
+      drawGridSize = parseInt(document.getElementById('drawSize').value);
+      if (drawGridSize < 5 || drawGridSize > 200) {
+        alert('Grid size must be between 5 and 200');
+        return;
+      }
+      drawCanvas.width = 400;
+      drawCanvas.height = 400;
+
+      drawData = createEmptyGrid(drawGridSize, drawGridSize);
+      drawSelectedColor = document.getElementById('drawColorPicker').value;
+      drawTool = 'draw';
+
+      renderDrawChart();
+      renderDrawLegend();
+      selectDrawTool('draw', true);
+    }
+
+    // Render draw canvas grid
+    function renderDrawChart() {
+      const ctx = drawCtx;
+      const width = drawCanvas.width;
+      const height = drawCanvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+      const cols = drawGridSize;
+      const rows = drawGridSize;
+      const cellW = width / cols;
+      const cellH = height / rows;
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          ctx.fillStyle = drawData[y][x] || '#fff';
+          ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+        }
+      }
+
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= cols; x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * cellW, 0);
+        ctx.lineTo(x * cellW, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= rows; y++) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * cellH);
+        ctx.lineTo(width, y * cellH);
+        ctx.stroke();
+      }
+    }
+
+    // Render color legend for draw panel
+    function renderDrawLegend() {
+      // Collect unique colors from drawData (up to 12 colors max)
+      let uniqueColors = new Set();
+      for (let row of drawData) {
+        for (let c of row) {
+          if (c) uniqueColors.add(c);
+        }
+      }
+      // If empty, add default selected color
+      if (uniqueColors.size === 0) uniqueColors.add(drawSelectedColor);
+
+      const legendDiv = document.getElementById('drawLegend');
+      legendDiv.innerHTML = '';
+
+      Array.from(uniqueColors).forEach(color => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch';
+        swatch.style.backgroundColor = color;
+        if (color === drawSelectedColor) swatch.classList.add('selected');
+        swatch.title = color;
+        swatch.dataset.color = color;
+        swatch.addEventListener('click', () => {
+          drawSelectedColor = color;
+          document.getElementById('drawColorPicker').value = color;
+          updateLegendSelection('drawLegend', color);
+        });
+        legendDiv.appendChild(swatch);
+      });
+    }
+
+    // Draw canvas click handler for draw panel
+    drawCanvas.addEventListener('click', (e) => {
+      if (!drawData.length) return;
+      const rect = drawCanvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / (drawCanvas.width / drawGridSize));
+      const y = Math.floor((e.clientY - rect.top) / (drawCanvas.height / drawGridSize));
+      if (x < 0 || y < 0 || x >= drawGridSize || y >= drawGridSize) return;
+
+      if (drawTool === 'draw') {
+        drawData[y][x] = drawSelectedColor;
+      } else if (drawTool === 'erase') {
+        drawData[y][x] = null;
+      } else if (drawTool === 'fill') {
+        const targetColor = drawData[y][x];
+        floodFill(drawData, x, y, targetColor, drawSelectedColor, drawGridSize, drawGridSize);
+      }
+      renderDrawChart();
+      renderDrawLegend();
+    });
+
+    // Save/load WIP for draw mode
+    function saveDrawWIP() {
+      if (!drawData.length) {
+        alert('No drawing to save!');
+        return;
+      }
+      const wip = {
+        size: drawGridSize,
+        data: drawData,
+      };
+      localStorage.setItem('clitorianDrawWIP', JSON.stringify(wip));
+      alert('Draw chart work-in-progress saved!');
+    }
+    function loadDrawWIP() {
+      const saved = localStorage.getItem('clitorianDrawWIP');
+      if (!saved) {
+        alert('No saved draw work found.');
+        return;
+      }
+      const wip = JSON.parse(saved);
+      drawGridSize = wip.size;
+      drawData = wip.data;
+
+      document.getElementById('drawSize').value = drawGridSize;
+      drawCanvas.width = 400;
+      drawCanvas.height = 400;
+      renderDrawChart();
+      renderDrawLegend();
+      alert('Draw chart work-in-progress loaded!');
+    }
+
+    // Save draw canvas as PNG or JPG
+    function saveDrawCanvasAsPNG() {
+      const link = document.createElement('a');
+      link.download = 'clitorian-draw-chart.png';
+      link.href = drawCanvas.toDataURL('image/png');
+      link.click();
+    }
+    function saveDrawCanvasAsJPG() {
+      const link = document.createElement('a');
+      link.download = 'clitorian-draw-chart.jpg';
+      link.href = drawCanvas.toDataURL('image/jpeg', 0.92);
+      link.click();
+    }
+
+    // --- Color utils ---
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      }).join('');
+    }
+
+    // K-means color reduction
+    // pixels = array of [r,g,b], k = number of clusters
+    function kMeansColorReduction(pixels, k) {
+      if (pixels.length === 0) return [];
+      // Initialize means randomly from pixels
+      let means = [];
+      for (let i = 0; i < k; i++) {
+        means.push(pixels[Math.floor(Math.random() * pixels.length)]);
+      }
+
+      let clusters = new Array(pixels.length);
+      let maxIter = 20;
+
+      for (let iter = 0; iter < maxIter; iter++) {
+        // Assign pixels to nearest mean
+        let changed = false;
+        for (let i = 0; i < pixels.length; i++) {
+          let p = pixels[i];
+          let minDist = Infinity;
+          let bestCluster = -1;
+          for (let c = 0; c < k; c++) {
+            let m = means[c];
+            let dist = colorDistance(p, m);
+            if (dist < minDist) {
+              minDist = dist;
+              bestCluster = c;
+            }
+          }
+          if (clusters[i] !== bestCluster) {
+            clusters[i] = bestCluster;
+            changed = true;
+          }
+        }
+        if (!changed) break;
+
+        // Recompute means
+        let sums = new Array(k).fill(null).map(() => [0, 0, 0]);
+        let counts = new Array(k).fill(0);
+        for (let i = 0; i < pixels.length; i++) {
+          let c = clusters[i];
+          let p = pixels[i];
+          sums[c][0] += p[0];
+          sums[c][1] += p[1];
+          sums[c][2] += p[2];
+          counts[c]++;
+        }
+        for (let c = 0; c < k; c++) {
+          if (counts[c] > 0) {
+            means[c] = [
+              Math.round(sums[c][0] / counts[c]),
+              Math.round(sums[c][1] / counts[c]),
+              Math.round(sums[c][2] / counts[c])
+            ];
+          }
+        }
+      }
+
+      // Map pixels to mean colors
+      let reduced = [];
+      for (let i = 0; i < pixels.length; i++) {
+        let c = clusters[i];
+        reduced[i] = means[c];
+      }
+      return reduced;
+    }
+
+    // Euclidean color distance
+    function colorDistance(c1, c2) {
+      return Math.sqrt(
+        (c1[0] - c2[0]) ** 2 +
+        (c1[1] - c2[1]) ** 2 +
+        (c1[2] - c2[2]) ** 2
+      );
+    }
+  </script>
+</body>
+</html>
