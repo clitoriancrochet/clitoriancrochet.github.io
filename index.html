@@ -4,103 +4,138 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clitorian Crochet Alpha Chart Generator</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Raleway:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Raleway:wght@400;700&display=swap');
 
-    body {
-      font-family: 'Raleway', sans-serif;
-      background-color: #fff0f6;
-      color: #5a005a;
-      margin: 0;
-      padding: 2rem;
-    }
-    h1 {
-      font-family: 'Pacifico', cursive;
-      text-align: center;
-      color: #ff69b4;
-      font-size: 2.5rem;
-    }
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      max-width: 1200px;
-      margin: auto;
-    }
-    .panel {
-      background: white;
-      border: 2px dashed #ffb6c1;
-      border-radius: 16px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .panel h2 {
-      font-size: 1.4rem;
-      color: #d63384;
-      font-family: 'Raleway', sans-serif;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    input[type="number"] {
-      width: 80px;
-      margin: 0 0.5rem 0 0;
-    }
-    canvas {
-      border: 1px solid #ccc;
-      margin-top: 1rem;
-      cursor: crosshair;
-      image-rendering: pixelated;
-    }
-    .toolbox button {
-      margin: 0.25rem;
-      padding: 0.5rem 1rem;
-      background-color: #ffb6c1;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .toolbox button.active {
-      background-color: #ff69b4;
-      color: white;
-    }
-    .controls {
-      margin-top: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    .legend {
-      margin-top: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      max-width: 90%;
-    }
-    .color-swatch {
-      width: 24px;
-      height: 24px;
-      border: 2px solid transparent;
-      border-radius: 4px;
-      cursor: pointer;
-      box-sizing: border-box;
-    }
-    .color-swatch.selected {
-      border-color: #ff69b4;
-      box-shadow: 0 0 5px #ff69b4;
-    }
-    label {
-      user-select: none;
-    }
-    button {
-      user-select: none;
-    }
-  </style>
+body {
+  font-family: 'Raleway', sans-serif;
+  background-color: #fff0f6;
+  color: #5a005a;
+  margin: 0;
+  padding: 2rem;
+}
+
+h1 {
+  font-family: 'Pacifico', cursive;
+  text-align: center;
+  color: #ff69b4;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Mobile responsive */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .controls label,
+  .toolbox button,
+  label {
+    font-size: 1rem;
+  }
+}
+
+.panel {
+  background: white;
+  border: 2px dashed #ffb6c1;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.panel h2 {
+  font-size: 1.4rem;
+  color: #d63384;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+input[type="number"] {
+  width: 80px;
+  margin: 0 0.5rem 0 0;
+}
+
+canvas {
+  border: 1px solid #ccc;
+  margin-top: 1rem;
+  cursor: crosshair;
+  image-rendering: pixelated;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+
+.toolbox button {
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  background-color: #ffb6c1;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbox button.active {
+  background-color: #ff69b4;
+  color: white;
+}
+
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.legend {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 90%;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.color-swatch.selected {
+  border-color: #ff69b4;
+  box-shadow: 0 0 5px #ff69b4;
+}
+
+label {
+  user-select: none;
+}
+
+button {
+  user-select: none;
+}
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3785480822876495"
      crossorigin="anonymous"></script>
 </head>
