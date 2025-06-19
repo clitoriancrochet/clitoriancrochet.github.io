@@ -464,7 +464,7 @@
     // Save canvas as PNG or JPG for upload canvas
     function saveUploadCanvasAsPNG() {
       const filename = prompt("Enter a file name for your PNG:", "clitorian-upload-chart") || "clitorian-upload-chart";
-  const scale = 4;
+  const scale = 8;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = uploadCanvas.width * scale;
   tempCanvas.height = uploadCanvas.height * scale;
@@ -479,7 +479,7 @@
     }
     function saveUploadCanvasAsJPG() {
      const filename = prompt("Enter a file name for your JPG:", "clitorian-upload-chart") || "clitorian-upload-chart";
-  const scale = 4;
+  const scale = 8;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = uploadCanvas.width * scale;
   tempCanvas.height = uploadCanvas.height * scale;
@@ -634,7 +634,7 @@
     // Save draw canvas as PNG or JPG
    function saveDrawCanvasAsPNG() {
   const filename = prompt("Enter a file name for your PNG:", "clitorian-draw-chart") || "clitorian-draw-chart";
-  const scale = 4;
+  const scale = 8;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = drawCanvas.width * scale;
   tempCanvas.height = drawCanvas.height * scale;
@@ -649,7 +649,7 @@
 }
    function saveDrawCanvasAsJPG() {
     const filename = prompt("Enter a file name for your JPG:", "clitorian-draw-chart") || "clitorian-draw-chart";
-  const scale = 4;
+  const scale = 8;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = drawCanvas.width * scale;
   tempCanvas.height = drawCanvas.height * scale;
